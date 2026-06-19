@@ -22,7 +22,16 @@ import ContaPage from './pages/Conta'
 import AdminLoginPage from './pages/AdminLogin'
 import AdminPage from './pages/Admin'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 3,
+      gcTime: 1000 * 60 * 10,
+      retry: 0,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 function ProtectedAdminRoute({ children }: { children: ReactNode }) {
   const { isAdmin, user, loading, enterWithoutPassword } = useAdmin()
@@ -89,7 +98,7 @@ function App() {
                 </ProtectedAdminRoute>
               }
             />
-            <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
 
             <Route path="/about" element={<Navigate to="/sobre" replace />} />
             <Route path="/hotels" element={<Navigate to="/casa-2" replace />} />

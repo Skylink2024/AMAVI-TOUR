@@ -1,22 +1,30 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { useAdmin, isAdminBypassEnabled } from '../context/AdminContext'
 import { AdminLayout, type AdminSection } from '../components/admin/AdminLayout'
-import { useSeedDefaultContent } from '../hooks/useContent'
 
-import AdminAnalytics from './admin/AdminAnalytics'
-import AdminReservationsEditor from './admin/AdminReservationsEditor'
-import AdminHeroEditor from './admin/AdminHeroEditor'
-import AdminAboutEditor from './admin/AdminAboutEditor'
-import AdminDancesEditor from './admin/AdminDancesEditor'
-import AdminEventsEditor from './admin/AdminEventsEditor'
-import AdminCoursesEditor from './admin/AdminCoursesEditor'
-import AdminGalleryEditor from './admin/AdminGalleryEditor'
-import AdminHotelsEditor from './admin/AdminHotelsEditor'
-import AdminTeamEditor from './admin/AdminTeamEditor'
-import AdminMaterialsEditor from './admin/AdminMaterialsEditor'
-import AdminGuestsEditor from './admin/AdminGuestsEditor'
+const AdminAnalytics = lazy(() => import('./admin/AdminAnalytics'))
+const AdminReservationsEditor = lazy(() => import('./admin/AdminReservationsEditor'))
+const AdminHeroEditor = lazy(() => import('./admin/AdminHeroEditor'))
+const AdminAboutEditor = lazy(() => import('./admin/AdminAboutEditor'))
+const AdminDancesEditor = lazy(() => import('./admin/AdminDancesEditor'))
+const AdminEventsEditor = lazy(() => import('./admin/AdminEventsEditor'))
+const AdminCoursesEditor = lazy(() => import('./admin/AdminCoursesEditor'))
+const AdminGalleryEditor = lazy(() => import('./admin/AdminGalleryEditor'))
+const AdminHotelsEditor = lazy(() => import('./admin/AdminHotelsEditor'))
+const AdminTeamEditor = lazy(() => import('./admin/AdminTeamEditor'))
+const AdminMaterialsEditor = lazy(() => import('./admin/AdminMaterialsEditor'))
+const AdminGuestsEditor = lazy(() => import('./admin/AdminGuestsEditor'))
+
+function SectionLoader() {
+  return (
+    <div className="flex items-center justify-center gap-2 py-20 text-amavi-brown/60">
+      <Loader2 className="h-5 w-5 animate-spin text-amavi-burnt" />
+      <span className="text-sm">A carregar...</span>
+    </div>
+  )
+}
 
 function renderSection(section: AdminSection) {
   switch (section) {
@@ -53,27 +61,12 @@ export default function AdminPage() {
   const { isAdmin, user, logout, loading, enterWithoutPassword } = useAdmin()
   const navigate = useNavigate()
   const [section, setSection] = useState<AdminSection>('analytics')
-  const {
-    isPending: isSeedingDefaultContent,
-    isSuccess: didSeedDefaultContent,
-    mutate: seedDefaultContent,
-  } = useSeedDefaultContent()
 
   useEffect(() => {
     if (!loading && !isAdmin && isAdminBypassEnabled) {
       enterWithoutPassword()
     }
   }, [loading, isAdmin, enterWithoutPassword])
-
-  useEffect(() => {
-    if (!isAdmin || !user || isSeedingDefaultContent || didSeedDefaultContent) return
-
-    seedDefaultContent(undefined, {
-      onError: () => {
-        // Fallback local já activo — seed opcional sem Supabase auth
-      },
-    })
-  }, [didSeedDefaultContent, isAdmin, isSeedingDefaultContent, seedDefaultContent, user])
 
   if (loading) {
     return (
@@ -91,7 +84,11 @@ export default function AdminPage() {
 
   const handleLogout = async () => {
     await logout()
-    navigate('/admin/login')
+    if (isAdminBypassEnabled) {
+      navigate('/')
+    } else {
+      navigate('/admin/login')
+    }
   }
 
   return (
@@ -100,9 +97,8 @@ export default function AdminPage() {
       onNavigate={setSection}
       userEmail={user.email}
       onLogout={handleLogout}
-      seeding={isSeedingDefaultContent}
     >
-      {renderSection(section)}
+      <Suspense fallback={<SectionLoader />}>{renderSection(section)}</Suspense>
     </AdminLayout>
   )
 }

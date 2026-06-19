@@ -5,6 +5,7 @@ import {
   STORAGE_BUCKETS,
   fileExtensionForUpload,
 } from "../lib/supabase";
+import { withTimeout } from "../lib/adminConfig";
 import {
   HeroSection,
   Dance,
@@ -52,7 +53,7 @@ async function safeFetchList<T>(
   fallback: T[],
 ): Promise<T[]> {
   try {
-    const { data, error } = await query();
+    const { data, error } = await withTimeout(query(), 3500);
     if (error) throw error;
     const list = data ?? [];
     return list.length > 0 ? list : fallback;
@@ -68,7 +69,7 @@ async function safeFetchOne<T>(
   merge?: (row: T) => T,
 ): Promise<T> {
   try {
-    const { data, error } = await query();
+    const { data, error } = await withTimeout(query(), 3500);
     if (error) throw error;
     if (!data) return fallback;
     return merge ? merge(data) : data;

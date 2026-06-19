@@ -15,7 +15,7 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({ email: '', password: '' })
 
-  // Em desenvolvimento: entra directo no painel real, sem password
+  // Em bypass: entra directo no painel, sem password (dev e produção)
   useEffect(() => {
     if (loading) return
     if (isAdminBypassEnabled && !isAdmin) {

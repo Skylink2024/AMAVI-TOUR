@@ -1,11 +1,9 @@
 import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import { isAdminBypassEnabled, withTimeout } from '../lib/adminConfig'
 
 const BYPASS_KEY = 'amavi_admin_session'
 const LOCAL_ADMIN = { id: 'local-admin', email: 'admin@amavi.co.ao' }
-
-/** Só em desenvolvimento local — nunca activar em produção */
-export const isAdminBypassEnabled = import.meta.env.DEV
 
 interface User {
   id: string
@@ -23,6 +21,8 @@ interface AdminContextType {
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined)
 
+export { isAdminBypassEnabled }
+
 function hasLocalSession(): boolean {
   try {
     return sessionStorage.getItem(BYPASS_KEY) === '1'
@@ -31,19 +31,29 @@ function hasLocalSession(): boolean {
   }
 }
 
-async function checkIsAdminUser(userId: string): Promise<boolean> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', userId)
-    .maybeSingle()
-
-  if (error) {
-    console.warn('Não foi possível verificar perfil admin:', error.message)
-    return true
+function activateBypass(
+  setUser: (u: User) => void,
+  setIsAdmin: (v: boolean) => void,
+) {
+  try {
+    sessionStorage.setItem(BYPASS_KEY, '1')
+  } catch {
+    /* ignore */
   }
+  setUser(LOCAL_ADMIN)
+  setIsAdmin(true)
+}
 
-  return data?.role === 'admin'
+async function checkIsAdminUser(userId: string): Promise<boolean> {
+  try {
+    const { data, error } = await withTimeout(
+      supabase.from('profiles').select('role').eq('id', userId).maybeSingle(),
+    )
+    if (error) return false
+    return data?.role === 'admin'
+  } catch {
+    return false
+  }
 }
 
 export function AdminProvider({ children }: { children: ReactNode }) {
@@ -53,14 +63,18 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   const enterWithoutPassword = useCallback(() => {
     if (!isAdminBypassEnabled) return
-    sessionStorage.setItem(BYPASS_KEY, '1')
-    setUser(LOCAL_ADMIN)
-    setIsAdmin(true)
+    activateBypass(setUser, setIsAdmin)
   }, [])
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (isAdminBypassEnabled && hasLocalSession()) {
+      if (isAdminBypassEnabled) {
+        activateBypass(setUser, setIsAdmin)
+        setLoading(false)
+        return
+      }
+
+      if (hasLocalSession()) {
         setUser(LOCAL_ADMIN)
         setIsAdmin(true)
         setLoading(false)
@@ -70,17 +84,13 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       try {
         const {
           data: { user: supabaseUser },
-        } = await supabase.auth.getUser()
+        } = await withTimeout(supabase.auth.getUser())
 
         if (supabaseUser) {
           const admin = await checkIsAdminUser(supabaseUser.id)
           if (admin) {
-            sessionStorage.removeItem(BYPASS_KEY)
             setUser({ id: supabaseUser.id, email: supabaseUser.email || '' })
             setIsAdmin(true)
-          } else {
-            setUser(null)
-            setIsAdmin(false)
           }
         }
       } catch (error) {
@@ -91,6 +101,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     }
 
     checkAuth()
+
+    if (isAdminBypassEnabled) return
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (hasLocalSession()) return
@@ -132,9 +144,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    const hadLocal = hasLocalSession()
     sessionStorage.removeItem(BYPASS_KEY)
-    if (!hadLocal) {
+    if (!isAdminBypassEnabled) {
       try {
         await supabase.auth.signOut()
       } catch (error) {
