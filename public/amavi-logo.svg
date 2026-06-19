@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 48" fill="none">
+  <text x="0" y="38" font-family="Syne, sans-serif" font-weight="800" font-size="42" letter-spacing="6" fill="currentColor">AMAVI</text>
+  <path d="M8 38 L20 8 L32 38 Z" fill="currentColor"/>
+  <path d="M14 30 L20 16 L26 30 Z" fill="var(--logo-cutout, #FFF8F0)"/>
+</svg>

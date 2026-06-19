@@ -1,0 +1,206 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* AMAVI brand */
+  --color-amavi-brown: #471401;
+  --color-amavi-burnt: #bf4904;
+  --color-amavi-amber: #f29f05;
+  --color-amavi-terracotta: #d9946c;
+  --color-amavi-golden: #f2cb05;
+  --color-amavi-cream: #fff8f0;
+  --color-amavi-sand: #f5e6d3;
+
+  --font-display: "Syne", sans-serif;
+  --font-sans: "Outfit", system-ui, sans-serif;
+
+  --animate-fade-in: fade-in 0.7s ease-out both;
+  --animate-fade-up: fade-up 0.8s ease-out both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ken-burns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
+}
+
+@keyframes scroll-dot {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(12px); opacity: 0.3; }
+}
+
+:root {
+  --radius: 0.75rem;
+  --amavi-cream: #fff8f0;
+
+  --background: #fff8f0;
+  --foreground: #471401;
+  --card: #ffffff;
+  --card-foreground: #471401;
+  --popover: #ffffff;
+  --popover-foreground: #471401;
+  --primary: #471401;
+  --primary-foreground: #fff8f0;
+  --secondary: #f5e6d3;
+  --secondary-foreground: #471401;
+  --muted: #f5e6d3;
+  --muted-foreground: #471401b3;
+  --accent: #bf4904;
+  --accent-foreground: #fff8f0;
+  --destructive: #dc2626;
+  --destructive-foreground: #fff8f0;
+  --border: #4714011a;
+  --input: #4714011a;
+  --ring: #bf4904;
+
+  --shadow-elegant: 0 24px 60px -20px rgba(71, 20, 1, 0.12);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-amavi-cream);
+    color: var(--color-amavi-brown);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Texto sempre legível */
+  p, li, span, label {
+    color: inherit;
+  }
+
+  .text-readable {
+    color: #471401;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .glass-amavi {
+    background: rgba(255, 248, 240, 0.82);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-bottom: 1px solid rgba(71, 20, 1, 0.06);
+  }
+
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+
+  .hero-ken-burns {
+    animation: ken-burns 18s ease-out forwards;
+    transform-origin: center;
+  }
+
+  .hero-image {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .scroll-hint-dot {
+    animation: scroll-dot 2s ease-in-out infinite;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .destination-card {
+    box-shadow: var(--shadow-elegant);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .destination-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 32px 70px -20px rgba(71, 20, 1, 0.18);
+  }
+
+  .amavi-container {
+    margin-inline: auto;
+    width: 100%;
+    max-width: min(100%, 90rem);
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .amavi-container {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .amavi-container {
+      padding-inline: 3.5rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .amavi-container {
+      padding-inline: 4rem;
+    }
+  }
+}
