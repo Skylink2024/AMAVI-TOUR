@@ -12,8 +12,8 @@ export const images = {
   heroNamibe: '/images/namibe-hero-hq.jpg',
   heroNamibeCoast: '/images/namibe-hero-hq.jpg',
   heroNamibeDesert: '/images/namibe-hero-hq.jpg',
-  /** Homepage — pôr do sol, deserto e mar (Namibe) */
-  heroMain: '/images/namibe-hero-sunset-hq.jpg',
+  /** Homepage — Pedras Negras / Pungo Andongo (HQ) */
+  heroMain: '/images/home-hero-pedras-negras-hq.jpg',
   brandIdentity: '/images/brand-identity.png',
   /** Paisagem de Huambo — terras altas e natureza */
   heroHuambo:

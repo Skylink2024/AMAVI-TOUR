@@ -17,12 +17,10 @@ export default function HomePage() {
             fetchPriority="high"
             decoding="async"
             sizes="100vw"
-            className="hero-image h-full w-full object-cover object-center brightness-[1.12] saturate-[1.08]"
+            className="hero-image h-full w-full object-cover object-[center_40%]"
           />
-          {/* Escurece só à esquerda (texto) e um pouco no topo (header) — o resto da foto fica visível */}
-          <div className="absolute inset-0 bg-gradient-to-r from-amavi-brown/55 via-amavi-brown/15 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent via-50% to-amavi-brown/20" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(242,159,5,0.12),transparent_50%)]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-amavi-brown/50 via-amavi-brown/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent via-45% to-amavi-brown/15" />
         </div>
 
         <div className="amavi-container relative z-10 flex min-h-screen flex-col justify-center pt-28 pb-16 lg:pt-32">
